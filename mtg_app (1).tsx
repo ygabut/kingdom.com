@@ -1,0 +1,1052 @@
+import { useState, useEffect } from "react";
+import {
+  LayoutDashboard, Radio, Upload, BookOpen, CreditCard, BarChart2,
+  Users, LogOut, Menu, Search, Youtube, ArrowLeft, Copy, Check,
+  DollarSign, Clock, ChevronRight, Plus, Wifi, TrendingUp, Bell,
+  AlertCircle, Mic, Globe, Play, FileText, Command, Sparkles, Crown
+} from "lucide-react";
+import {
+  AreaChart, Area, BarChart, Bar, XAxis, YAxis,
+  Tooltip, ResponsiveContainer, CartesianGrid
+} from "recharts";
+
+const Styles = () => <style>{`
+  @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Inter:wght@300;400;500;600;700;800&display=swap');
+  :root {
+    --bg: #fafbff;
+    --bg-soft: #f4f7fd;
+    --white: #ffffff;
+    --blue: #1e3a8a;
+    --blue-bright: #3b82f6;
+    --blue-deep: #0f1e4a;
+    --blue-soft: rgba(30, 58, 138, 0.06);
+    --blue-soft-2: rgba(30, 58, 138, 0.1);
+    --blue-glow: rgba(30, 58, 138, 0.15);
+    --gold: #b8924a;
+    --gold-bright: #d4af6a;
+    --gold-dim: #8a6e36;
+    --gold-soft: rgba(184, 146, 74, 0.1);
+    --gold-soft-2: rgba(184, 146, 74, 0.18);
+    --gold-glow: rgba(184, 146, 74, 0.25);
+    --gold-line: rgba(184, 146, 74, 0.45);
+    --ink: #0f172a;
+    --ink-2: #1e293b;
+    --muted: #475569;
+    --faint: #94a3b8;
+    --very-faint: #cbd5e1;
+    --border: rgba(226, 232, 240, 0.9);
+    --border-strong: #e2e8f0;
+    --border-hover: rgba(184, 146, 74, 0.5);
+    --glass: rgba(255, 255, 255, 0.6);
+    --glass-2: rgba(255, 255, 255, 0.8);
+    --glass-border: rgba(226, 232, 240, 0.7);
+    --shadow-xs: 0 1px 3px rgba(15, 23, 42, 0.04);
+    --shadow-sm: 0 2px 12px rgba(15, 23, 42, 0.04);
+    --shadow-md: 0 8px 30px rgba(15, 23, 42, 0.06);
+    --shadow-lg: 0 20px 50px rgba(15, 23, 42, 0.08);
+    --shadow-gold: 0 20px 50px rgba(184, 146, 74, 0.18), 0 0 0 1px rgba(184, 146, 74, 0.2);
+    --shadow-blue: 0 12px 32px rgba(30, 58, 138, 0.2);
+    --danger: #dc2626;
+    --danger-soft: rgba(220, 38, 38, 0.08);
+    --success: #16a34a;
+    --success-soft: rgba(22, 163, 74, 0.08);
+  }
+  html, body, #root { background: var(--bg); margin: 0; padding: 0; }
+  * { box-sizing: border-box; }
+  body { font-family: 'Inter', -apple-system, system-ui, sans-serif; color: var(--ink); }
+  .mtg-root { font-family: 'Inter', sans-serif; color: var(--ink); min-height: 100vh; background: var(--bg); position: relative; overflow-x: hidden; }
+  .serif { font-family: 'Playfair Display', Georgia, serif; letter-spacing: -0.015em; font-weight: 500; }
+  .serif-bold { font-family: 'Playfair Display', Georgia, serif; letter-spacing: -0.02em; font-weight: 700; }
+  .mono { font-family: 'Courier New', monospace; letter-spacing: 0.02em; }
+  .caps { text-transform: uppercase; letter-spacing: 0.18em; font-size: 10px; font-weight: 600; }
+  
+  .aurora { position: fixed; inset: 0; z-index: 0; overflow: hidden; pointer-events: none; }
+  .blob { position: absolute; border-radius: 50%; filter: blur(110px); animation: drift 22s ease-in-out infinite; }
+  .blob-1 { width: 640px; height: 640px; background: radial-gradient(circle, #3b82f6 0%, transparent 65%); top: -240px; left: -120px; opacity: 0.12; }
+  .blob-2 { width: 560px; height: 560px; background: radial-gradient(circle, #d4af6a 0%, transparent 70%); bottom: -200px; right: -140px; animation-delay: -8s; opacity: 0.18; }
+  .blob-3 { width: 440px; height: 440px; background: radial-gradient(circle, #1e3a8a 0%, transparent 70%); top: 35%; right: 25%; animation-delay: -15s; opacity: 0.06; }
+  .blob-4 { width: 360px; height: 360px; background: radial-gradient(circle, #b8924a 0%, transparent 70%); bottom: 25%; left: 30%; animation-delay: -4s; opacity: 0.1; }
+  
+  @keyframes drift {
+    0%, 100% { transform: translate(0, 0) scale(1); }
+    33% { transform: translate(90px, -60px) scale(1.12); }
+    66% { transform: translate(-50px, 70px) scale(0.92); }
+  }
+  @keyframes fade-in-up {
+    from { opacity: 0; transform: translateY(16px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes fade-in { from { opacity: 0; } to { opacity: 1; } }
+  @keyframes pulse-blue {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(30, 58, 138, 0.4); }
+    50% { box-shadow: 0 0 0 14px rgba(30, 58, 138, 0); }
+  }
+  @keyframes pulse-red {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(220, 38, 38, 0.5); }
+    50% { box-shadow: 0 0 0 14px rgba(220, 38, 38, 0); }
+  }
+  @keyframes shimmer {
+    0% { background-position: -200% 0; }
+    100% { background-position: 200% 0; }
+  }
+  .fade-in-up { animation: fade-in-up 0.6s cubic-bezier(0.16, 1, 0.3, 1) both; }
+  .fade-in { animation: fade-in 0.4s ease-out both; }
+  .stagger-1 { animation-delay: 0.05s; }
+  .stagger-2 { animation-delay: 0.1s; }
+  .stagger-3 { animation-delay: 0.15s; }
+  .stagger-4 { animation-delay: 0.2s; }
+  .pulse-blue { animation: pulse-blue 2.4s ease-in-out infinite; }
+  .pulse-red { animation: pulse-red 1.8s ease-in-out infinite; }
+  .shimmer-gold {
+    background: linear-gradient(90deg, #b8924a 0%, #d4af6a 40%, #f0d78e 50%, #d4af6a 60%, #b8924a 100%);
+    background-size: 200% 100%;
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: shimmer 4s ease-in-out infinite;
+  }
+  
+  .card {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    box-shadow: var(--shadow-sm);
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .card-hover:hover {
+    border-color: var(--border-hover);
+    box-shadow: var(--shadow-gold);
+    transform: translateY(-2px);
+  }
+  .glass {
+    background: var(--glass);
+    backdrop-filter: blur(20px) saturate(1.4);
+    -webkit-backdrop-filter: blur(20px) saturate(1.4);
+    border: 1px solid var(--glass-border);
+    border-radius: 20px;
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .glass-strong {
+    background: var(--glass-2);
+    backdrop-filter: blur(24px) saturate(1.6);
+    -webkit-backdrop-filter: blur(24px) saturate(1.6);
+    border: 1px solid var(--glass-border);
+    border-radius: 20px;
+  }
+  
+  .gold-line { height: 1px; background: linear-gradient(90deg, transparent, var(--gold) 50%, transparent); }
+  .gold-line-short { height: 1px; background: linear-gradient(90deg, var(--gold), transparent); width: 40px; }
+  
+  .btn-blue {
+    background: linear-gradient(135deg, #2947a8 0%, #1e3a8a 50%, #162d6f 100%);
+    color: #fff;
+    border: 1px solid rgba(15, 30, 74, 0.3);
+    font-weight: 600;
+    font-size: 14px;
+    letter-spacing: 0.01em;
+    padding: 13px 24px;
+    border-radius: 14px;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-family: inherit;
+  }
+  .btn-blue::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, #3b5bc7 0%, #2947a8 100%);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+  .btn-blue > * { position: relative; z-index: 1; }
+  .btn-blue:hover {
+    box-shadow: 0 14px 36px rgba(30, 58, 138, 0.3), 0 0 0 1px var(--gold);
+    transform: translateY(-2px);
+  }
+  .btn-blue:hover::before { opacity: 1; }
+  .btn-blue:active { transform: translateY(0); }
+  .btn-blue:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+  
+  .btn-gold {
+    background: linear-gradient(135deg, #d4af6a 0%, #b8924a 50%, #9a7a38 100%);
+    color: #fff;
+    border: 1px solid rgba(138, 110, 54, 0.4);
+    font-weight: 700;
+    font-size: 14px;
+    letter-spacing: 0.01em;
+    padding: 13px 24px;
+    border-radius: 14px;
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-family: inherit;
+  }
+  .btn-gold:hover { box-shadow: 0 14px 36px var(--gold-glow); transform: translateY(-2px); }
+  
+  .btn-ghost {
+    background: var(--white);
+    color: var(--ink);
+    border: 1px solid var(--border-strong);
+    font-weight: 600;
+    font-size: 14px;
+    padding: 12px 22px;
+    border-radius: 14px;
+    transition: all 0.25s ease;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-family: inherit;
+  }
+  .btn-ghost:hover { border-color: var(--gold); color: var(--blue); box-shadow: 0 4px 12px rgba(184, 146, 74, 0.12); }
+  
+  .btn-danger {
+    background: linear-gradient(135deg, #e53e3e, #c53030);
+    color: #fff;
+    border: none;
+    font-weight: 700;
+    padding: 13px 24px;
+    border-radius: 14px;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 14px;
+    transition: all 0.25s ease;
+  }
+  .btn-danger:hover { box-shadow: 0 10px 30px rgba(220, 38, 38, 0.3); }
+  
+  .input-premium {
+    background: var(--white);
+    border: 1px solid var(--border-strong);
+    color: var(--ink);
+    padding: 14px 18px;
+    border-radius: 14px;
+    font-size: 15px;
+    outline: none;
+    width: 100%;
+    transition: all 0.3s ease;
+    font-family: inherit;
+    box-shadow: var(--shadow-xs);
+  }
+  .input-premium::placeholder { color: var(--faint); }
+  .input-premium:focus {
+    border-color: var(--gold);
+    box-shadow: 0 0 0 3px var(--gold-soft-2), var(--shadow-sm);
+  }
+  
+  ::-webkit-scrollbar { width: 8px; height: 8px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: rgba(184, 146, 74, 0.25); border-radius: 4px; }
+  ::-webkit-scrollbar-thumb:hover { background: rgba(184, 146, 74, 0.5); }
+`}</style>;
+
+const Aurora = () => (
+  <div className="aurora">
+    <div className="blob blob-1"/>
+    <div className="blob blob-2"/>
+    <div className="blob blob-3"/>
+    <div className="blob blob-4"/>
+  </div>
+);
+
+const SERMONS = [
+  { id:1, title:"Walking in Faith", speaker:"Pastor John Smith", date:"13 April 2026", series:"Faith Foundations", duration:"42:15", status:"published", ytUrl:"https://youtube.com/watch?v=abc123", transcript:"Brothers and sisters, today we explore what it truly means to walk in faith. Faith is not the absence of doubt — it is the decision to move forward despite uncertainty. Abraham did not know where he was going when God called him, yet he went. That is faith in action. We see this pattern throughout Scripture: Noah built an ark before the rain came. Moses stepped toward the Red Sea before it parted. Every great move of God began with one person choosing to trust what they could not yet see. Faith is the currency of the Kingdom — and today, God is asking each of us what we will invest." },
+  { id:2, title:"The Power of Prayer", speaker:"Pastor John Smith", date:"6 April 2026", series:"Prayer Series", duration:"38:42", status:"published", ytUrl:"https://youtube.com/watch?v=def456", transcript:"Prayer is the foundation of our relationship with God. It is not religious ritual — it is communication with the living God. Today we explore five dimensions of prayer that will transform your daily walk. First, adoration — coming before God not with a list but with wonder..." },
+  { id:3, title:"Grace and Mercy", speaker:"Pastor Sarah Chen", date:"30 March 2026", series:"Grace Series", duration:"45:10", status:"draft", ytUrl:null, transcript:"Grace is not something we earn — it is something freely given. Yet too often we live as if we must deserve it. Today we unpack the profound difference between grace and mercy. Mercy is not getting what we deserve. Grace is getting what we do not deserve..." },
+  { id:4, title:"Kingdom Purpose", speaker:"Pastor John Smith", date:"23 March 2026", series:"Kingdom Vision", duration:"51:30", status:"published", ytUrl:"https://youtube.com/watch?v=ghi789", transcript:"God has a specific purpose for each one of us in His kingdom. Not a vague general purpose — but a specific, personal calling that only you can fulfill..." },
+  { id:5, title:"Foundations of Community", speaker:"Elder James Wilson", date:"16 March 2026", series:"Community", duration:"35:20", status:"processing", ytUrl:null, transcript:"We were not designed to walk alone. From the very beginning God said it was not good for man to be alone. Community is not optional for the believer — it is essential to spiritual formation..." },
+];
+const COST_DATA = [
+  { month:"Nov", mux:85, revenue:110 }, { month:"Dec", mux:102, revenue:120 },
+  { month:"Jan", mux:118, revenue:130 }, { month:"Feb", mux:95, revenue:130 },
+  { month:"Mar", mux:132, revenue:130 }, { month:"Apr", mux:143, revenue:130 },
+];
+const TIERS = [
+  { name:"Small Church", tag:"Essential", hours:"Up to 4 hrs/month", price:10, cost:2, margin:80, desc:"For weekly sermon delivery", features:["4 hours video/month","QR code generation","Transcript storage","YouTube auto-post","Email support"] },
+  { name:"Medium Church", tag:"Most Popular", hours:"8–12 hrs/month", price:20, cost:5, margin:75, desc:"For growing congregations", features:["12 hours video/month","Everything in Essential","Custom branding","Priority support","Analytics dashboard"], popular:true },
+  { name:"Megachurch", tag:"Enterprise", hours:"40+ hrs/month", price:50, cost:19, margin:62, desc:"For large ministries & networks", features:["40+ hours video/month","Everything in Medium","Dedicated success manager","99.9% SLA guarantee","Custom integrations"] },
+];
+const CIRCLE_MEMBERS = [
+  { name:"Sarah M.", role:"Member", a1:5, a2:4, status:"growing" },
+  { name:"David K.", role:"Member", a1:5, a2:5, status:"growing" },
+  { name:"Ruth P.", role:"Member", a1:2, a2:1, status:"needs-support" },
+  { name:"James T.", role:"Guide", a1:5, a2:5, status:"growing" },
+  { name:"Mary L.", role:"Member", a1:4, a2:4, status:"growing" },
+  { name:"Peter W.", role:"Member", a1:5, a2:3, status:"growing" },
+  { name:"Grace O.", role:"Member", a1:1, a2:0, status:"needs-support" },
+];
+
+const QR = ({ data, size=180 }) => (
+  <img src={`https://api.qrserver.com/v1/create-qr-code/?size=${size}x${size}&data=${encodeURIComponent(data)}&bgcolor=ffffff&color=0f172a&margin=10`} alt="QR Code" width={size} height={size} style={{borderRadius:10,display:"block"}} />
+);
+
+const Badge = ({ label, variant="default" }) => {
+  const map = {
+    published: { bg: "rgba(22, 163, 74, 0.1)", color: "#15803d", border: "rgba(22, 163, 74, 0.25)" },
+    draft: { bg: "rgba(184, 146, 74, 0.12)", color: "#8a6e36", border: "rgba(184, 146, 74, 0.3)" },
+    processing: { bg: "rgba(59, 130, 246, 0.1)", color: "#1e40af", border: "rgba(59, 130, 246, 0.25)" },
+    growing: { bg: "rgba(22, 163, 74, 0.1)", color: "#15803d", border: "rgba(22, 163, 74, 0.25)" },
+    "needs-support": { bg: "rgba(220, 38, 38, 0.08)", color: "#b91c1c", border: "rgba(220, 38, 38, 0.25)" },
+    default: { bg: "var(--blue-soft)", color: "var(--blue)", border: "rgba(30, 58, 138, 0.2)" },
+  };
+  const s = map[variant] || map.default;
+  return <span style={{background:s.bg,color:s.color,fontSize:10,fontWeight:700,padding:"4px 10px",borderRadius:20,textTransform:"uppercase",letterSpacing:0.8,border:`1px solid ${s.border}`,whiteSpace:"nowrap"}}>{label.replace("-"," ")}</span>;
+};
+
+const StatCard = ({ label, value, sub, icon:Icon, trend, delay=0 }) => (
+  <div className="card card-hover fade-in-up" style={{padding:"24px 26px",animationDelay:`${delay}s`}}>
+    <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",marginBottom:10}}>
+      <p className="caps" style={{color:"var(--muted)",margin:0}}>{label}</p>
+      <div style={{background:"var(--blue-soft)",padding:8,borderRadius:10,border:"1px solid var(--blue-soft-2)"}}><Icon size={14} color="var(--blue)"/></div>
+    </div>
+    <p className="serif-bold" style={{fontSize:36,color:"var(--ink)",margin:"4px 0",lineHeight:1}}>{value}</p>
+    {sub && <div style={{display:"flex",alignItems:"center",gap:6,marginTop:6}}>
+      {trend && <TrendingUp size={12} color={trend==="up"?"var(--success)":"var(--danger)"}/>}
+      <p style={{fontSize:12,color:"var(--muted)",margin:0}}>{sub}</p>
+    </div>}
+  </div>
+);
+
+const SectionHeader = ({ eyebrow, title, subtitle, action }) => (
+  <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-end",marginBottom:32,gap:24,flexWrap:"wrap"}}>
+    <div>
+      {eyebrow && <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:8}}>
+        <div className="gold-line-short"/><p className="caps" style={{color:"var(--gold)",margin:0}}>{eyebrow}</p>
+      </div>}
+      <h1 className="serif-bold" style={{fontSize:36,color:"var(--ink)",margin:0,lineHeight:1.1}}>{title}</h1>
+      {subtitle && <p style={{color:"var(--muted)",fontSize:15,margin:"10px 0 0",maxWidth:520,lineHeight:1.6}}>{subtitle}</p>}
+    </div>
+    {action}
+  </div>
+);
+
+const NAV = [
+  { id:"dashboard", icon:LayoutDashboard, label:"Dashboard" },
+  { id:"stream", icon:Radio, label:"Live Stream" },
+  { id:"upload", icon:Upload, label:"Upload Sermon" },
+  { id:"library", icon:BookOpen, label:"Sermon Library" },
+  null,
+  { id:"subscriptions", icon:CreditCard, label:"Subscriptions" },
+  { id:"costs", icon:BarChart2, label:"Cost Dashboard" },
+  { id:"circles", icon:Users, label:"Learning Circles" },
+];
+
+const Sidebar = ({ active, onNav, open, onToggle, onLogout }) => (
+  <aside style={{width:open?260:72,minHeight:"100vh",flexShrink:0,transition:"width .3s cubic-bezier(0.16, 1, 0.3, 1)",position:"relative",zIndex:2}}>
+    <div className="glass-strong" style={{height:"100vh",display:"flex",flexDirection:"column",borderRadius:0,borderTop:0,borderBottom:0,borderLeft:0,borderRight:"1px solid var(--border)",position:"sticky",top:0,background:"rgba(255,255,255,0.75)"}}>
+      <div style={{padding:open?"22px 22px 18px":"22px 12px 18px",borderBottom:"1px solid var(--border)",display:"flex",alignItems:"center",gap:12,justifyContent:open?"space-between":"center"}}>
+        {open ? (
+          <div style={{display:"flex",alignItems:"center",gap:12}}>
+            <div style={{width:40,height:40,background:"linear-gradient(135deg,#1e3a8a,#0f1e4a)",borderRadius:11,display:"flex",alignItems:"center",justifyContent:"center",boxShadow:"0 4px 20px var(--blue-glow), 0 0 0 1px var(--gold)"}}>
+              <Crown size={20} color="#d4af6a"/>
+            </div>
+            <div>
+              <div className="serif-bold" style={{fontSize:16,color:"var(--ink)",lineHeight:1,margin:0}}>Messages to Go</div>
+              <div className="caps" style={{color:"var(--gold)",marginTop:4}}>Kingdom Inc.</div>
+            </div>
+          </div>
+        ) : (
+          <div style={{width:36,height:36,background:"linear-gradient(135deg,#1e3a8a,#0f1e4a)",borderRadius:10,display:"flex",alignItems:"center",justifyContent:"center",boxShadow:"0 0 0 1px var(--gold)"}}><Crown size={18} color="#d4af6a"/></div>
+        )}
+        {open && <button onClick={onToggle} style={{background:"none",border:"none",color:"var(--muted)",cursor:"pointer",padding:6,borderRadius:8,transition:"color .2s"}} onMouseOver={e=>e.currentTarget.style.color="var(--blue)"} onMouseOut={e=>e.currentTarget.style.color="var(--muted)"}><Menu size={18}/></button>}
+      </div>
+      {!open && <button onClick={onToggle} style={{background:"none",border:"none",color:"var(--muted)",cursor:"pointer",padding:14,display:"flex",justifyContent:"center"}}><Menu size={16}/></button>}
+      
+      <nav style={{flex:1,padding:"16px 12px",overflowY:"auto"}}>
+        {NAV.map((item,i) => !item ? (
+          <div key={i} style={{margin:"14px 8px"}} className="gold-line"/>
+        ) : (
+          <button key={item.id} onClick={()=>onNav(item.id)} style={{width:"100%",display:"flex",alignItems:"center",gap:12,padding:open?"11px 14px":"12px",background:active===item.id?"var(--blue-soft-2)":"transparent",color:active===item.id?"var(--blue)":"var(--muted)",border:"none",borderRadius:12,cursor:"pointer",fontSize:13,fontWeight:active===item.id?700:500,textAlign:"left",transition:"all .2s ease",marginBottom:3,position:"relative",fontFamily:"inherit",justifyContent:open?"flex-start":"center"}} onMouseOver={e=>{if(active!==item.id){e.currentTarget.style.color="var(--ink)";e.currentTarget.style.background="var(--bg-soft)"}}} onMouseOut={e=>{if(active!==item.id){e.currentTarget.style.color="var(--muted)";e.currentTarget.style.background="transparent"}}}>
+            {active===item.id && open && <div style={{position:"absolute",left:0,top:"25%",bottom:"25%",width:2,background:"var(--gold)",borderRadius:2}}/>}
+            <item.icon size={17} style={{flexShrink:0}}/>
+            {open && <span style={{letterSpacing:.01}}>{item.label}</span>}
+          </button>
+        ))}
+      </nav>
+      
+      {open && <div style={{padding:"12px 16px",borderTop:"1px solid var(--border)"}}>
+        <div className="card" style={{padding:"10px 12px",display:"flex",alignItems:"center",gap:10,borderRadius:12,boxShadow:"none"}}>
+          <div style={{width:32,height:32,background:"linear-gradient(135deg,#1e3a8a,#0f1e4a)",borderRadius:"50%",display:"flex",alignItems:"center",justifyContent:"center",color:"#d4af6a",fontWeight:800,fontSize:12,boxShadow:"0 0 0 1px var(--gold)"}}>JB</div>
+          <div style={{flex:1,minWidth:0}}>
+            <p style={{margin:0,fontSize:12,fontWeight:700,color:"var(--ink)",overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>Juanita Berguson</p>
+            <p style={{margin:0,fontSize:10,color:"var(--faint)"}}>Administrator</p>
+          </div>
+          <button onClick={onLogout} style={{background:"none",border:"none",color:"var(--muted)",cursor:"pointer",padding:4,borderRadius:6}} onMouseOver={e=>e.currentTarget.style.color="var(--blue)"} onMouseOut={e=>e.currentTarget.style.color="var(--muted)"}><LogOut size={14}/></button>
+        </div>
+      </div>}
+    </div>
+  </aside>
+);
+
+const TopBar = () => (
+  <div style={{padding:"18px 32px",borderBottom:"1px solid var(--border)",display:"flex",alignItems:"center",gap:16,background:"rgba(250,251,255,0.8)",backdropFilter:"blur(20px)",WebkitBackdropFilter:"blur(20px)",position:"sticky",top:0,zIndex:3}}>
+    <div style={{flex:1,maxWidth:440}}>
+      <div className="card" style={{display:"flex",alignItems:"center",gap:10,padding:"9px 16px",borderRadius:12,boxShadow:"none"}}>
+        <Search size={15} color="var(--faint)"/>
+        <input placeholder="Search sermons, speakers, transcripts…" style={{flex:1,background:"none",border:"none",color:"var(--ink)",fontSize:13,outline:"none",fontFamily:"inherit"}}/>
+        <div style={{display:"flex",alignItems:"center",gap:3,padding:"3px 7px",background:"var(--bg-soft)",border:"1px solid var(--border)",borderRadius:6,fontSize:11,color:"var(--muted)",fontFamily:"monospace"}}>⌘K</div>
+      </div>
+    </div>
+    <div style={{flex:1}}/>
+    <button className="card" style={{padding:10,borderRadius:12,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",background:"var(--white)",color:"var(--ink)",border:"1px solid var(--border-strong)",boxShadow:"none"}} onMouseOver={e=>e.currentTarget.style.borderColor="var(--gold)"} onMouseOut={e=>e.currentTarget.style.borderColor="var(--border-strong)"}>
+      <Bell size={16}/>
+    </button>
+  </div>
+);
+
+const LoginScreen = ({ onLogin }) => {
+  const [email,setEmail] = useState(""); const [pw,setPw] = useState("");
+  return (
+    <div className="mtg-root">
+      <Aurora/>
+      <div style={{position:"relative",zIndex:1,minHeight:"100vh",display:"grid",gridTemplateColumns:"1fr 1fr"}}>
+        <div style={{padding:"64px 60px",display:"flex",flexDirection:"column",justifyContent:"space-between"}}>
+          <div style={{display:"flex",alignItems:"center",gap:14}}>
+            <div style={{width:44,height:44,background:"linear-gradient(135deg,#1e3a8a,#0f1e4a)",borderRadius:12,display:"flex",alignItems:"center",justifyContent:"center",boxShadow:"0 8px 30px var(--blue-glow), 0 0 0 1px var(--gold)"}}><Crown size={22} color="#d4af6a"/></div>
+            <div className="serif-bold" style={{fontSize:20,color:"var(--ink)"}}>Kingdom Inc.</div>
+          </div>
+          
+          <div className="fade-in-up">
+            <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:16}}><div className="gold-line-short"/><p className="caps" style={{color:"var(--gold)",margin:0}}>Since 1980</p></div>
+            <h1 className="serif-bold" style={{fontSize:56,color:"var(--ink)",margin:"0 0 24px",lineHeight:1.05,maxWidth:520}}>Every sermon,<br/><em className="shimmer-gold" style={{fontStyle:"italic"}}>everywhere.</em></h1>
+            <p style={{fontSize:17,color:"var(--muted)",lineHeight:1.7,maxWidth:480,margin:0}}>Messages to Go restores the human moment of handing someone a sermon. Scan, share, preach — to every corner of your community.</p>
+            
+            <div style={{display:"flex",gap:40,marginTop:48,flexWrap:"wrap"}}>
+              {[["250K+","Churches served"],["70K","Churches reached"],["2M+","Messages delivered"]].map(([n,l])=>(
+                <div key={l}>
+                  <p className="serif-bold" style={{fontSize:28,color:"var(--blue)",margin:0,lineHeight:1}}>{n}</p>
+                  <p className="caps" style={{color:"var(--gold)",margin:"6px 0 0"}}>{l}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+          
+          <p style={{fontSize:12,color:"var(--faint)",margin:0,fontStyle:"italic"}} className="serif">"Connecting worlds, creating prosperity, leaving legacy."</p>
+        </div>
+        
+        <div style={{padding:"64px 60px",display:"flex",alignItems:"center",justifyContent:"center"}}>
+          <div className="glass-strong fade-in-up stagger-2" style={{width:"100%",maxWidth:420,padding:40,borderRadius:24,boxShadow:"var(--shadow-lg), 0 0 0 1px var(--gold-soft-2)"}}>
+            <div style={{textAlign:"center",marginBottom:32}}>
+              <h2 className="serif-bold" style={{fontSize:26,color:"var(--ink)",margin:"0 0 8px"}}>Welcome back</h2>
+              <p style={{color:"var(--muted)",fontSize:14,margin:0}}>Sign in to your Messages to Go account</p>
+            </div>
+            
+            <button onClick={()=>onLogin("google")} className="btn-ghost" style={{width:"100%",marginBottom:10,justifyContent:"center",padding:"14px"}}>
+              <Globe size={16} color="#4285F4"/> Continue with Google
+            </button>
+            <button onClick={()=>onLogin("apple")} className="btn-ghost" style={{width:"100%",marginBottom:24,justifyContent:"center",padding:"14px"}}>
+              <span style={{fontSize:16,color:"var(--ink)"}}>⌘</span> Continue with Apple
+            </button>
+            
+            <div style={{display:"flex",alignItems:"center",gap:12,marginBottom:22}}>
+              <div style={{flex:1}} className="gold-line"/>
+              <span className="caps" style={{color:"var(--gold)"}}>or email</span>
+              <div style={{flex:1}} className="gold-line"/>
+            </div>
+            
+            <input value={email} onChange={e=>setEmail(e.target.value)} placeholder="Email address" className="input-premium" style={{marginBottom:12}}/>
+            <input type="password" value={pw} onChange={e=>setPw(e.target.value)} placeholder="Password" className="input-premium" style={{marginBottom:22}}/>
+            
+            <button onClick={()=>onLogin("email")} className="btn-blue" style={{width:"100%",justifyContent:"center",padding:"15px"}}>
+              Sign In <ChevronRight size={16}/>
+            </button>
+            
+            <p style={{textAlign:"center",fontSize:12,color:"var(--faint)",marginTop:20,marginBottom:0}}>Forgot password? <span style={{color:"var(--blue)",cursor:"pointer",fontWeight:600}}>Reset it</span></p>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+const Dashboard = ({ onNav }) => (
+  <div style={{padding:32}} className="fade-in">
+    <SectionHeader eyebrow="Overview" title="Good morning, Juanita" subtitle="Here's what's happening across your sermon platform today."
+      action={<button onClick={()=>onNav("stream")} className="btn-blue"><Radio size={15}/>Go Live</button>}/>
+    
+    <div style={{display:"grid",gridTemplateColumns:"repeat(4,1fr)",gap:18,marginBottom:24}}>
+      <StatCard label="Total Sermons" value="47" sub="3 this week" icon={BookOpen} delay={0}/>
+      <StatCard label="Monthly Views" value="12,840" sub="+18% vs last month" icon={TrendingUp} trend="up" delay={0.05}/>
+      <StatCard label="Mux Cost (Apr)" value="$143" sub="Budget $200/mo" icon={DollarSign} delay={0.1}/>
+      <StatCard label="Subscriptions" value="3" sub="$130/mo revenue" icon={CreditCard} delay={0.15}/>
+    </div>
+    
+    <div style={{display:"grid",gridTemplateColumns:"2fr 1fr",gap:18}}>
+      <div className="card fade-in-up stagger-3" style={{padding:26}}>
+        <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:20}}>
+          <div>
+            <p className="caps" style={{color:"var(--gold)",margin:"0 0 4px"}}>Recent</p>
+            <h2 className="serif-bold" style={{fontSize:22,color:"var(--ink)",margin:0}}>Sermon Activity</h2>
+          </div>
+          <button onClick={()=>onNav("library")} style={{background:"none",border:"none",color:"var(--blue)",fontSize:13,fontWeight:700,cursor:"pointer",display:"flex",alignItems:"center",gap:4,fontFamily:"inherit"}}>View all <ChevronRight size={13}/></button>
+        </div>
+        {SERMONS.slice(0,4).map((s,i) => (
+          <div key={s.id} onClick={()=>onNav("library")} style={{display:"flex",alignItems:"center",gap:14,padding:"14px 0",borderTop:i>0?"1px solid var(--border)":"none",cursor:"pointer",transition:"all .2s",borderRadius:8}} onMouseOver={e=>{e.currentTarget.style.background="var(--bg-soft)";e.currentTarget.style.paddingLeft="10px";e.currentTarget.style.paddingRight="10px"}} onMouseOut={e=>{e.currentTarget.style.background="transparent";e.currentTarget.style.paddingLeft="0";e.currentTarget.style.paddingRight="0"}}>
+            <div style={{width:42,height:42,background:"var(--blue-soft)",border:"1px solid var(--blue-soft-2)",display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0,borderRadius:12}}><Mic size={16} color="var(--blue)"/></div>
+            <div style={{flex:1,minWidth:0}}>
+              <p className="serif" style={{fontWeight:600,color:"var(--ink)",fontSize:15,margin:0,overflow:"hidden",whiteSpace:"nowrap",textOverflow:"ellipsis"}}>{s.title}</p>
+              <p style={{fontSize:12,color:"var(--muted)",margin:"3px 0 0"}}>{s.speaker} · {s.date}</p>
+            </div>
+            <Badge label={s.status} variant={s.status}/>
+            {s.ytUrl && <Youtube size={14} color="var(--danger)"/>}
+          </div>
+        ))}
+      </div>
+      
+      <div className="card fade-in-up stagger-4" style={{padding:26}}>
+        <p className="caps" style={{color:"var(--gold)",margin:"0 0 4px"}}>Quick Actions</p>
+        <h2 className="serif-bold" style={{fontSize:22,color:"var(--ink)",margin:"0 0 18px"}}>Shortcuts</h2>
+        {[{label:"Start Live Stream",icon:Radio,s:"stream"},{label:"Upload Sermon",icon:Upload,s:"upload"},{label:"Sermon Library",icon:BookOpen,s:"library"},{label:"Learning Circles",icon:Users,s:"circles"}].map(a => (
+          <button key={a.s} onClick={()=>onNav(a.s)} className="card card-hover" style={{width:"100%",display:"flex",alignItems:"center",gap:12,padding:"13px 14px",borderRadius:14,cursor:"pointer",marginBottom:8,textAlign:"left",color:"var(--ink)",fontSize:13,fontWeight:600,fontFamily:"inherit",boxShadow:"none"}}>
+            <div style={{background:"var(--blue-soft)",padding:8,borderRadius:10,border:"1px solid var(--blue-soft-2)"}}><a.icon size={14} color="var(--blue)"/></div>
+            <span style={{flex:1}}>{a.label}</span>
+            <ChevronRight size={14} color="var(--faint)"/>
+          </button>
+        ))}
+      </div>
+    </div>
+  </div>
+);
+
+const StreamSetup = () => {
+  const [step,setStep] = useState(1); const [rtmp,setRtmp] = useState(""); const [copied,setCopied] = useState(false);
+  const url = `https://mtg.kingdom.com/live/${rtmp||"your-stream-key"}`;
+  const copy = () => { navigator.clipboard?.writeText(rtmp); setCopied(true); setTimeout(()=>setCopied(false),2000); };
+  return (
+    <div style={{padding:32,maxWidth:640,margin:"0 auto"}} className="fade-in">
+      <SectionHeader eyebrow="Broadcast" title="Live Stream Setup" subtitle="Connect your RTMP stream. Generate a QR code. Your congregation scans to watch."/>
+      
+      <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:28,flexWrap:"wrap"}}>
+        {[1,2,3].map(n => (
+          <div key={n} style={{display:"flex",alignItems:"center",gap:10}}>
+            <div style={{width:34,height:34,borderRadius:"50%",background:step>=n?"linear-gradient(135deg,#1e3a8a,#0f1e4a)":"var(--white)",color:step>=n?"#fff":"var(--faint)",display:"flex",alignItems:"center",justifyContent:"center",fontWeight:800,fontSize:13,border:step>=n?"1px solid var(--gold)":"1px solid var(--border-strong)",transition:"all .3s",boxShadow:step>=n?"0 4px 14px var(--blue-glow)":"none"}}>
+              {step>n?<Check size={14}/>:n}
+            </div>
+            <span className="caps" style={{color:step>=n?"var(--blue)":"var(--faint)"}}>{["Connect","QR Code","Go Live"][n-1]}</span>
+            {n<3 && <div style={{width:28,height:1,background:step>n?"var(--gold)":"var(--border-strong)"}}/>}
+          </div>
+        ))}
+      </div>
+      
+      <div className="card fade-in-up" style={{padding:36,borderRadius:24}}>
+        {step===1 && <>
+          <h2 className="serif-bold" style={{fontSize:24,color:"var(--ink)",margin:"0 0 8px"}}>Enter your RTMP Stream ID</h2>
+          <p style={{color:"var(--muted)",fontSize:14,margin:"0 0 24px"}}>Get this from OBS, Streamlabs, or your broadcasting software.</p>
+          <input value={rtmp} onChange={e=>setRtmp(e.target.value)} placeholder="e.g. abc123xyz-live-stream-key" className="input-premium" style={{marginBottom:16}}/>
+          <div style={{padding:"14px 18px",marginBottom:28,borderRadius:12,background:"var(--blue-soft)",border:"1px solid var(--blue-soft-2)"}}>
+            <p className="caps" style={{color:"var(--blue)",margin:"0 0 6px"}}>Mux RTMP Ingest</p>
+            <p className="mono" style={{fontSize:13,color:"var(--ink)",margin:0,wordBreak:"break-all"}}>rtmp://global-live.mux.com:5222/app/</p>
+          </div>
+          <button onClick={()=>rtmp&&setStep(2)} disabled={!rtmp} className="btn-blue" style={{width:"100%",justifyContent:"center",padding:"15px"}}>
+            Generate QR Code <ChevronRight size={16}/>
+          </button>
+        </>}
+        
+        {step===2 && <div style={{textAlign:"center"}}>
+          <h2 className="serif-bold" style={{fontSize:24,color:"var(--ink)",margin:"0 0 6px"}}>Your QR Code is Ready</h2>
+          <p style={{color:"var(--muted)",fontSize:14,margin:"0 0 28px"}}>Display on screen — congregation scans to watch live.</p>
+          <div style={{display:"inline-block",padding:20,background:"var(--white)",border:"1px solid var(--gold)",borderRadius:24,marginBottom:24,boxShadow:"0 20px 60px var(--gold-glow)"}}>
+            <QR data={url} size={200}/>
+          </div>
+          <div style={{display:"flex",alignItems:"center",gap:8,padding:"12px 16px",marginBottom:24,borderRadius:12,background:"var(--bg-soft)",border:"1px solid var(--border)"}}>
+            <p className="mono" style={{fontSize:12,color:"var(--ink)",flex:1,margin:0,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap",textAlign:"left"}}>{url}</p>
+            <button onClick={copy} style={{background:"none",border:"none",cursor:"pointer",color:"var(--blue)",padding:4,lineHeight:0}}>{copied?<Check size={15}/>:<Copy size={15}/>}</button>
+          </div>
+          <button onClick={()=>setStep(3)} className="btn-blue" style={{width:"100%",justifyContent:"center",padding:"15px"}}>Start Streaming <ChevronRight size={16}/></button>
+        </div>}
+        
+        {step===3 && <>
+          <div style={{display:"flex",alignItems:"center",gap:12,marginBottom:24}}>
+            <div className="pulse-red" style={{width:10,height:10,background:"var(--danger)",borderRadius:"50%"}}/>
+            <h2 className="serif-bold" style={{fontSize:24,color:"var(--ink)",margin:0}}>Stream is Live</h2>
+          </div>
+          <div style={{background:"linear-gradient(135deg, #0f1e4a, #1e3a8a)",border:"1px solid var(--gold)",borderRadius:20,aspectRatio:"16/9",display:"flex",alignItems:"center",justifyContent:"center",marginBottom:24,position:"relative",overflow:"hidden"}}>
+            <div style={{position:"absolute",top:"20%",right:"15%",width:200,height:200,background:"radial-gradient(circle,rgba(212,175,106,0.3),transparent 70%)",borderRadius:"50%",filter:"blur(40px)"}}/>
+            <div style={{textAlign:"center",position:"relative"}}>
+              <div style={{width:60,height:60,background:"linear-gradient(135deg,#d4af6a,#b8924a)",borderRadius:"50%",display:"flex",alignItems:"center",justifyContent:"center",margin:"0 auto 12px",boxShadow:"0 10px 40px var(--gold-glow)"}}><Wifi size={26} color="#0f1e4a"/></div>
+              <p className="serif" style={{color:"#fff",fontWeight:600,margin:0,fontSize:16}}>Live via Mux</p>
+              <p style={{color:"rgba(255,255,255,0.6)",fontSize:12,margin:"4px 0 0"}}>Injecting video stream…</p>
+            </div>
+          </div>
+          <div style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:12,marginBottom:24}}>
+            {[["Viewers","—"],["Duration","00:00:00"],["Bitrate","—"]].map(([l,v])=>(
+              <div key={l} style={{padding:"14px 12px",textAlign:"center",background:"var(--bg-soft)",border:"1px solid var(--border)",borderRadius:12}}>
+                <p className="serif-bold" style={{fontSize:22,color:"var(--blue)",margin:0,lineHeight:1}}>{v}</p>
+                <p className="caps" style={{color:"var(--muted)",margin:"6px 0 0"}}>{l}</p>
+              </div>
+            ))}
+          </div>
+          <button onClick={()=>setStep(1)} className="btn-danger" style={{width:"100%",padding:"15px"}}>End Stream</button>
+        </>}
+      </div>
+    </div>
+  );
+};
+
+const UploadSermon = () => {
+  const [tab,setTab] = useState("file"); const [url,setUrl] = useState(""); const [title,setTitle] = useState(""); const [speaker,setSpeaker] = useState(""); const [series,setSeries] = useState(""); const [yt,setYt] = useState(true); const [drag,setDrag] = useState(false); const [done,setDone] = useState(false);
+  return (
+    <div style={{padding:32,maxWidth:640,margin:"0 auto"}} className="fade-in">
+      <SectionHeader eyebrow="Upload" title="Add a Sermon" subtitle="Upload a recorded sermon or import from a URL. We'll auto-transcribe and detect the sermon segment."/>
+      
+      {!done ? <>
+        <div className="card fade-in-up" style={{padding:28,marginBottom:16,borderRadius:20}}>
+          <div style={{display:"flex",gap:8,marginBottom:22,background:"var(--bg-soft)",padding:4,borderRadius:12,border:"1px solid var(--border)"}}>
+            {[["file","File Upload"],["url","URL Import"]].map(([t,l])=>(
+              <button key={t} onClick={()=>setTab(t)} style={{flex:1,padding:"10px",border:"none",borderRadius:8,fontWeight:700,fontSize:13,cursor:"pointer",background:tab===t?"linear-gradient(135deg,#1e3a8a,#0f1e4a)":"transparent",color:tab===t?"#fff":"var(--muted)",fontFamily:"inherit",transition:"all .3s",letterSpacing:.3,boxShadow:tab===t?"0 4px 14px var(--blue-glow)":"none"}}>{l}</button>
+            ))}
+          </div>
+          {tab==="file" ? (
+            <div onDragOver={e=>{e.preventDefault();setDrag(true)}} onDragLeave={()=>setDrag(false)} onDrop={e=>{e.preventDefault();setDrag(false)}} style={{border:`2px dashed ${drag?"var(--gold)":"var(--border-strong)"}`,borderRadius:18,padding:48,textAlign:"center",background:drag?"var(--gold-soft)":"var(--bg-soft)",transition:"all .3s",cursor:"pointer"}}>
+              <div style={{width:56,height:56,background:"linear-gradient(135deg,#1e3a8a,#0f1e4a)",border:"1px solid var(--gold)",borderRadius:"50%",display:"flex",alignItems:"center",justifyContent:"center",margin:"0 auto 14px",boxShadow:"0 8px 24px var(--blue-glow)"}}><Upload size={22} color="#d4af6a"/></div>
+              <p className="serif" style={{fontWeight:600,color:"var(--ink)",margin:0,fontSize:16}}>Drop your video file here</p>
+              <p style={{fontSize:13,color:"var(--muted)",margin:"6px 0 16px"}}>MP4, MOV, MKV — up to 10 GB</p>
+              <button className="btn-ghost">Browse Files</button>
+            </div>
+          ) : (
+            <div>
+              <input value={url} onChange={e=>setUrl(e.target.value)} placeholder="https://youtube.com/watch?v=... or direct video URL" className="input-premium" style={{marginBottom:6}}/>
+              <p style={{fontSize:12,color:"var(--muted)",margin:0}}>Supports YouTube, Vimeo, and direct video URLs</p>
+            </div>
+          )}
+        </div>
+        
+        <div className="card fade-in-up stagger-1" style={{padding:28,marginBottom:20,borderRadius:20}}>
+          <h3 className="serif-bold" style={{fontSize:18,color:"var(--ink)",margin:"0 0 18px"}}>Sermon Details</h3>
+          <input value={title} onChange={e=>setTitle(e.target.value)} placeholder="Sermon title *" className="input-premium" style={{marginBottom:12}}/>
+          <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:12,marginBottom:16}}>
+            <input value={speaker} onChange={e=>setSpeaker(e.target.value)} placeholder="Speaker name" className="input-premium"/>
+            <input value={series} onChange={e=>setSeries(e.target.value)} placeholder="Series name" className="input-premium"/>
+          </div>
+          <div style={{display:"flex",alignItems:"center",gap:14,padding:"14px 18px",borderRadius:14,background:"var(--bg-soft)",border:"1px solid var(--border)"}}>
+            <div onClick={()=>setYt(!yt)} style={{width:46,height:26,borderRadius:13,background:yt?"linear-gradient(135deg,#1e3a8a,#0f1e4a)":"var(--very-faint)",cursor:"pointer",display:"flex",alignItems:"center",padding:"0 3px",transition:"all .3s",flexShrink:0,boxShadow:yt?"0 0 12px var(--blue-glow)":"none",border:yt?"1px solid var(--gold-soft-2)":"none"}}>
+              <div style={{width:20,height:20,background:"#fff",borderRadius:"50%",transform:yt?"translateX(20px)":"none",transition:"transform .3s cubic-bezier(0.16, 1, 0.3, 1)",boxShadow:"0 1px 3px rgba(0,0,0,0.1)"}}/>
+            </div>
+            <div style={{flex:1}}>
+              <p className="serif" style={{fontWeight:600,fontSize:14,color:"var(--ink)",margin:0}}>Auto-post to YouTube</p>
+              <p style={{fontSize:12,color:"var(--muted)",margin:"2px 0 0"}}>Trimmed sermon only — admin & worship removed</p>
+            </div>
+            <Youtube size={18} color="var(--danger)"/>
+          </div>
+        </div>
+        
+        <button onClick={()=>setDone(true)} className="btn-blue" style={{width:"100%",justifyContent:"center",padding:"16px",fontSize:15}}>
+          <Sparkles size={16}/> Upload & Process Sermon
+        </button>
+      </> : (
+        <div className="card fade-in-up" style={{padding:48,borderRadius:24,textAlign:"center"}}>
+          <div style={{width:72,height:72,background:"linear-gradient(135deg,rgba(22,163,74,0.15),rgba(22,163,74,0.05))",border:"1px solid rgba(22,163,74,0.3)",borderRadius:"50%",display:"flex",alignItems:"center",justifyContent:"center",margin:"0 auto 18px"}}><Check size={30} color="var(--success)"/></div>
+          <h2 className="serif-bold" style={{fontSize:28,color:"var(--ink)",margin:"0 0 8px"}}>Uploaded!</h2>
+          <p style={{color:"var(--muted)",fontSize:14,margin:"0 0 28px"}}>Your sermon is being processed. Check the library for updates.</p>
+          {[["done","Video uploaded to Mux"],["wait","AI transcription in progress"],["wait","Sermon segment detection"],["wait","YouTube post queued"]].map(([s,l],i)=>(
+            <div key={l} style={{display:"flex",alignItems:"center",gap:12,padding:"13px 18px",marginBottom:8,textAlign:"left",background:"var(--bg-soft)",border:"1px solid var(--border)",borderRadius:12}}>
+              <div style={{width:24,height:24,borderRadius:"50%",display:"flex",alignItems:"center",justifyContent:"center",background:s==="done"?"rgba(22,163,74,0.15)":"var(--gold-soft)",border:`1px solid ${s==="done"?"rgba(22,163,74,0.35)":"var(--gold-soft-2)"}`,flexShrink:0}}>
+                {s==="done" ? <Check size={12} color="var(--success)"/> : <Clock size={12} color="var(--gold)"/>}
+              </div>
+              <span style={{fontSize:13,fontWeight:500,color:"var(--ink)"}}>{l}</span>
+            </div>
+          ))}
+          <button onClick={()=>setDone(false)} className="btn-ghost" style={{marginTop:24,padding:"13px 28px"}}>Upload Another</button>
+        </div>
+      )}
+    </div>
+  );
+};
+
+const SermonLibrary = ({ onDetail }) => {
+  const [q,setQ] = useState(""); const [f,setF] = useState("all");
+  const list = SERMONS.filter(s => {
+    const m = !q || [s.title,s.speaker,s.series].some(v=>v.toLowerCase().includes(q.toLowerCase()));
+    return m && (f==="all" || s.status===f);
+  });
+  return (
+    <div style={{padding:32}} className="fade-in">
+      <SectionHeader eyebrow="Library" title="Sermon Library" subtitle={`${SERMONS.length} sermons · transcripts retained · video streamed from Mux`}
+        action={<button className="btn-blue"><Plus size={14}/>Add Sermon</button>}/>
+      
+      <div style={{display:"flex",gap:12,marginBottom:24,flexWrap:"wrap"}}>
+        <div className="card" style={{flex:"1 1 320px",display:"flex",alignItems:"center",gap:10,padding:"12px 18px",borderRadius:14,boxShadow:"none"}}>
+          <Search size={15} color="var(--faint)"/>
+          <input value={q} onChange={e=>setQ(e.target.value)} placeholder="Search by title, speaker, series, or transcript…" style={{flex:1,background:"none",border:"none",color:"var(--ink)",fontSize:14,outline:"none",fontFamily:"inherit"}}/>
+        </div>
+        <div style={{display:"flex",gap:6}}>
+          {["all","published","draft","processing"].map(s=>(
+            <button key={s} onClick={()=>setF(s)} style={{padding:"10px 16px",borderRadius:12,border:"1px solid",borderColor:f===s?"var(--gold)":"var(--border-strong)",background:f===s?"linear-gradient(135deg,#1e3a8a,#0f1e4a)":"var(--white)",color:f===s?"#fff":"var(--muted)",fontWeight:600,fontSize:12,cursor:"pointer",textTransform:"capitalize",transition:"all .2s",fontFamily:"inherit",letterSpacing:.3}}>{s}</button>
+          ))}
+        </div>
+      </div>
+      
+      <div className="card fade-in-up" style={{overflow:"hidden",borderRadius:20}}>
+        {list.length===0 ? (
+          <div style={{padding:60,textAlign:"center",color:"var(--muted)"}}>
+            <Search size={36} style={{marginBottom:12,opacity:.4}}/>
+            <p className="serif" style={{fontWeight:600,margin:0,fontSize:16}}>No sermons match your search</p>
+          </div>
+        ) : list.map((s,i)=>(
+          <div key={s.id} onClick={()=>onDetail(s)} style={{display:"flex",alignItems:"center",gap:16,padding:"18px 24px",cursor:"pointer",borderTop:i>0?"1px solid var(--border)":"none",transition:"all .2s"}} onMouseOver={e=>{e.currentTarget.style.background="var(--bg-soft)"}} onMouseOut={e=>{e.currentTarget.style.background="transparent"}}>
+            <div style={{width:48,height:48,display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0,borderRadius:12,background:"var(--blue-soft)",border:"1px solid var(--blue-soft-2)"}}><Mic size={18} color="var(--blue)"/></div>
+            <div style={{flex:1,minWidth:0}}>
+              <p className="serif" style={{fontWeight:600,color:"var(--ink)",fontSize:16,margin:0,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{s.title}</p>
+              <p style={{fontSize:12,color:"var(--muted)",margin:"4px 0 0"}}>{s.speaker} · {s.series} · {s.date}</p>
+            </div>
+            <div style={{display:"flex",alignItems:"center",gap:12,flexShrink:0}}>
+              <span className="mono" style={{fontSize:12,color:"var(--muted)"}}>{s.duration}</span>
+              <Badge label={s.status} variant={s.status}/>
+              {s.ytUrl && <Youtube size={14} color="var(--danger)"/>}
+              <ChevronRight size={14} color="var(--faint)"/>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+};
+
+const SermonDetail = ({ sermon, onBack }) => {
+  const [q,setQ] = useState("");
+  const hi = text => {
+    if(!q) return <span>{text}</span>;
+    const re = new RegExp(`(${q})`, "gi");
+    return text.split(re).map((p,i)=>re.test(p)?<mark key={i} style={{background:"var(--gold-soft-2)",color:"var(--gold-dim)",padding:"0 2px",borderRadius:3}}>{p}</mark>:<span key={i}>{p}</span>);
+  };
+  return (
+    <div style={{padding:32,maxWidth:760,margin:"0 auto"}} className="fade-in">
+      <button onClick={onBack} style={{display:"flex",alignItems:"center",gap:8,background:"none",border:"none",color:"var(--muted)",fontWeight:600,fontSize:13,cursor:"pointer",marginBottom:22,padding:0,fontFamily:"inherit"}} onMouseOver={e=>e.currentTarget.style.color="var(--blue)"} onMouseOut={e=>e.currentTarget.style.color="var(--muted)"}>
+        <ArrowLeft size={15}/>Back to Library
+      </button>
+      
+      <div className="card fade-in-up" style={{padding:36,marginBottom:18,borderRadius:24}}>
+        <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",marginBottom:22,gap:16,flexWrap:"wrap"}}>
+          <div>
+            <p className="caps" style={{color:"var(--gold)",margin:"0 0 8px"}}>{sermon.series}</p>
+            <h1 className="serif-bold" style={{fontSize:34,color:"var(--ink)",margin:"0 0 8px",lineHeight:1.15}}>{sermon.title}</h1>
+            <p style={{color:"var(--muted)",fontSize:14,margin:0}}>{sermon.speaker} · {sermon.date}</p>
+          </div>
+          <Badge label={sermon.status} variant={sermon.status}/>
+        </div>
+        
+        <div style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:12,marginBottom:22}}>
+          {[[Clock,sermon.duration,"Duration"],[BookOpen,sermon.series,"Series"],[Mic,sermon.speaker.split(" ").slice(-1)[0],"Speaker"]].map(([Icon,v,l])=>(
+            <div key={l} style={{padding:"14px 16px",background:"var(--bg-soft)",border:"1px solid var(--border)",borderRadius:12}}>
+              <div style={{display:"flex",alignItems:"center",gap:6,marginBottom:6}}><Icon size={12} color="var(--gold)"/><p className="caps" style={{color:"var(--muted)",margin:0,fontSize:9}}>{l}</p></div>
+              <p className="serif" style={{fontWeight:600,color:"var(--ink)",fontSize:14,margin:0}}>{v}</p>
+            </div>
+          ))}
+        </div>
+        
+        {sermon.ytUrl ? (
+          <a href={sermon.ytUrl} target="_blank" rel="noopener noreferrer" style={{display:"flex",alignItems:"center",gap:14,padding:"16px 20px",textDecoration:"none",borderRadius:14,background:"rgba(220,38,38,0.04)",border:"1px solid rgba(220,38,38,0.2)",transition:"all .2s"}} onMouseOver={e=>{e.currentTarget.style.background="rgba(220,38,38,0.08)";e.currentTarget.style.borderColor="var(--gold)"}} onMouseOut={e=>{e.currentTarget.style.background="rgba(220,38,38,0.04)";e.currentTarget.style.borderColor="rgba(220,38,38,0.2)"}}>
+            <div style={{background:"rgba(220,38,38,0.12)",border:"1px solid rgba(220,38,38,0.25)",padding:10,borderRadius:12}}><Youtube size={20} color="var(--danger)"/></div>
+            <div style={{flex:1}}>
+              <p className="serif" style={{fontWeight:600,color:"var(--ink)",fontSize:14,margin:0}}>Watch on YouTube</p>
+              <p className="mono" style={{fontSize:11,color:"var(--muted)",margin:"3px 0 0",overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{sermon.ytUrl}</p>
+            </div>
+            <ChevronRight size={15} color="var(--faint)"/>
+          </a>
+        ) : (
+          <div style={{display:"flex",alignItems:"center",gap:12,padding:"14px 20px",borderRadius:14,background:"var(--gold-soft)",border:"1px solid var(--gold-soft-2)"}}>
+            <AlertCircle size={16} color="var(--gold)"/>
+            <p style={{fontSize:13,fontWeight:500,color:"var(--gold-dim)",margin:0}}>Not yet posted to YouTube — finish processing to publish.</p>
+          </div>
+        )}
+      </div>
+      
+      <div className="card fade-in-up stagger-1" style={{padding:36,borderRadius:24}}>
+        <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:20,gap:16,flexWrap:"wrap"}}>
+          <div>
+            <p className="caps" style={{color:"var(--gold)",margin:"0 0 4px"}}>Searchable</p>
+            <h2 className="serif-bold" style={{fontSize:22,color:"var(--ink)",margin:0}}>Sermon Transcript</h2>
+          </div>
+          <div style={{display:"flex",alignItems:"center",gap:8,padding:"8px 14px",borderRadius:12,background:"var(--bg-soft)",border:"1px solid var(--border)"}}>
+            <Search size={13} color="var(--faint)"/>
+            <input value={q} onChange={e=>setQ(e.target.value)} placeholder="Search transcript…" style={{background:"none",border:"none",color:"var(--ink)",fontSize:13,outline:"none",fontFamily:"inherit",width:180}}/>
+          </div>
+        </div>
+        <div style={{padding:24,maxHeight:260,overflowY:"auto",borderRadius:14,background:"var(--bg-soft)",border:"1px solid var(--border)"}}>
+          <p className="serif" style={{color:"var(--ink)",lineHeight:1.9,fontSize:15,margin:0,fontStyle:"italic",opacity:.9}}>"{hi(sermon.transcript)}"</p>
+        </div>
+        <p style={{fontSize:11,color:"var(--muted)",margin:"14px 0 0",textAlign:"center"}}>Full transcript retained · Video stored on Mux · Auto-trimmed at upload</p>
+      </div>
+    </div>
+  );
+};
+
+const Subscriptions = () => {
+  const [curr] = useState("Medium Church");
+  return (
+    <div style={{padding:32}} className="fade-in">
+      <SectionHeader eyebrow="Billing" title="Subscription Tiers" subtitle="Choose the plan that fits your church. Margin-preserving at every tier — Mux video scales with your audience."/>
+      
+      <div style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:20,marginBottom:28}}>
+        {TIERS.map((t,i)=>{
+          const isPopular = t.popular; const isCurr = curr===t.name;
+          return (
+            <div key={t.name} className="card card-hover fade-in-up" style={{padding:32,borderRadius:24,position:"relative",animationDelay:`${i*0.08}s`,border:isPopular?"1px solid var(--gold)":"1px solid var(--border)",boxShadow:isPopular?"var(--shadow-gold)":"var(--shadow-sm)"}}>
+              {isPopular && <div style={{position:"absolute",top:-13,left:"50%",transform:"translateX(-50%)",background:"linear-gradient(135deg,#d4af6a,#b8924a)",color:"#fff",padding:"5px 16px",borderRadius:20,fontSize:10,fontWeight:800,letterSpacing:.8,textTransform:"uppercase",whiteSpace:"nowrap",boxShadow:"0 4px 20px var(--gold-glow)",border:"1px solid rgba(138,110,54,0.4)"}}>★ Most Popular</div>}
+              {isCurr && <div style={{position:"absolute",top:-13,right:20,background:"linear-gradient(135deg,rgba(22,163,74,0.15),rgba(22,163,74,0.05))",color:"var(--success)",padding:"5px 14px",borderRadius:20,fontSize:10,fontWeight:800,border:"1px solid rgba(22,163,74,0.3)",letterSpacing:.5,textTransform:"uppercase"}}>Current</div>}
+              
+              <p className="caps" style={{color:"var(--gold)",margin:"0 0 8px"}}>{t.tag}</p>
+              <h3 className="serif-bold" style={{fontSize:24,color:"var(--ink)",margin:"0 0 6px"}}>{t.name}</h3>
+              <p style={{fontSize:13,color:"var(--muted)",margin:"0 0 22px",lineHeight:1.5}}>{t.desc}</p>
+              
+              <div style={{marginBottom:8,display:"flex",alignItems:"baseline",gap:4}}>
+                <span className="serif-bold" style={{fontSize:44,color:"var(--ink)",lineHeight:1}}>${t.price}</span>
+                <span style={{fontSize:13,color:"var(--muted)"}}>/month</span>
+              </div>
+              <p style={{fontSize:13,color:"var(--blue)",margin:"0 0 22px",fontWeight:600}}>{t.hours}</p>
+              
+              <div className="gold-line" style={{marginBottom:18}}/>
+              
+              <div style={{marginBottom:22}}>
+                {t.features.map(f=>(
+                  <div key={f} style={{display:"flex",alignItems:"center",gap:10,marginBottom:10}}>
+                    <div style={{width:16,height:16,borderRadius:"50%",background:"var(--blue-soft)",border:"1px solid var(--blue-soft-2)",display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}}><Check size={9} color="var(--blue)"/></div>
+                    <span style={{fontSize:13,color:"var(--ink)"}}>{f}</span>
+                  </div>
+                ))}
+              </div>
+              
+              <div style={{padding:"10px 14px",marginBottom:16,borderRadius:12,background:"var(--bg-soft)",border:"1px solid var(--border)"}}>
+                <p style={{fontSize:11,color:"var(--muted)",margin:0,textAlign:"center"}}>Platform cost ~${t.cost}/mo · <span style={{color:"var(--gold)",fontWeight:700}}>{t.margin}% margin</span></p>
+              </div>
+              
+              <button disabled={isCurr} className={isCurr?"btn-ghost":isPopular?"btn-gold":"btn-blue"} style={{width:"100%",justifyContent:"center",padding:"14px",opacity:isCurr?.5:1,cursor:isCurr?"default":"pointer"}}>
+                {isCurr?"Current Plan":"Switch Plan"}
+              </button>
+            </div>
+          );
+        })}
+      </div>
+      
+      <div className="card fade-in-up stagger-3" style={{padding:28}}>
+        <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:20,flexWrap:"wrap",gap:12}}>
+          <div>
+            <p className="caps" style={{color:"var(--gold)",margin:"0 0 4px"}}>Account</p>
+            <h3 className="serif-bold" style={{fontSize:20,color:"var(--ink)",margin:0}}>Billing Summary</h3>
+          </div>
+          <button className="btn-ghost"><CreditCard size={14}/> Manage via Stripe Portal</button>
+        </div>
+        <div style={{display:"grid",gridTemplateColumns:"repeat(4,1fr)",gap:14}}>
+          {[["Current Plan","Medium Church"],["Next Bill","1 May 2026"],["Monthly Rate","$20.00"],["Status","Active"]].map(([l,v])=>(
+            <div key={l} style={{padding:"16px 18px",background:"var(--bg-soft)",border:"1px solid var(--border)",borderRadius:12}}>
+              <p className="caps" style={{color:"var(--muted)",margin:"0 0 6px"}}>{l}</p>
+              <p className="serif" style={{fontWeight:600,color:"var(--ink)",fontSize:15,margin:0}}>{v}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+};
+
+const CostDashboard = () => {
+  const tooltipStyle = { background:"#fff",border:"1px solid var(--gold)",borderRadius:12,fontSize:12,color:"#0f172a",padding:"8px 12px",boxShadow:"var(--shadow-md)" };
+  return (
+    <div style={{padding:32}} className="fade-in">
+      <SectionHeader eyebrow="Financials" title="Cost Dashboard" subtitle="Platform spend, Mux consumption, and Stripe revenue — tracked in real time."/>
+      
+      <div style={{display:"grid",gridTemplateColumns:"repeat(4,1fr)",gap:18,marginBottom:24}}>
+        <StatCard label="Mux Cost (Apr)" value="$142" sub="↑ $10 vs March" icon={DollarSign} trend="down" delay={0}/>
+        <StatCard label="Stripe Revenue" value="$130" sub="3 active subscriptions" icon={TrendingUp} trend="up" delay={0.05}/>
+        <StatCard label="Net Position" value="-$12" sub="After revenue offset" icon={BarChart2} delay={0.1}/>
+        <StatCard label="Storage Used" value="47 GB" sub="12 hrs this month" icon={BookOpen} delay={0.15}/>
+      </div>
+      
+      <div style={{display:"grid",gridTemplateColumns:"3fr 2fr",gap:18,marginBottom:18}}>
+        <div className="card fade-in-up stagger-3" style={{padding:28}}>
+          <p className="caps" style={{color:"var(--gold)",margin:"0 0 4px"}}>6-Month View</p>
+          <h2 className="serif-bold" style={{fontSize:20,color:"var(--ink)",margin:"0 0 20px"}}>Cost vs Revenue</h2>
+          <ResponsiveContainer width="100%" height={220}>
+            <AreaChart data={COST_DATA}>
+              <defs>
+                <linearGradient id="muxG" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stopColor="#1e3a8a" stopOpacity={0.3}/>
+                  <stop offset="100%" stopColor="#1e3a8a" stopOpacity={0}/>
+                </linearGradient>
+                <linearGradient id="revG" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stopColor="#b8924a" stopOpacity={0.3}/>
+                  <stop offset="100%" stopColor="#b8924a" stopOpacity={0}/>
+                </linearGradient>
+              </defs>
+              <CartesianGrid strokeDasharray="3 3" stroke="rgba(15,23,42,0.06)"/>
+              <XAxis dataKey="month" tick={{fontSize:11,fill:"#475569"}} axisLine={{stroke:"rgba(15,23,42,0.1)"}} tickLine={false}/>
+              <YAxis tick={{fontSize:11,fill:"#475569"}} axisLine={false} tickLine={false}/>
+              <Tooltip contentStyle={tooltipStyle}/>
+              <Area type="monotone" dataKey="mux" stroke="#1e3a8a" fill="url(#muxG)" strokeWidth={2} name="Mux Cost"/>
+              <Area type="monotone" dataKey="revenue" stroke="#b8924a" fill="url(#revG)" strokeWidth={2} name="Revenue"/>
+            </AreaChart>
+          </ResponsiveContainer>
+        </div>
+        <div className="card fade-in-up stagger-4" style={{padding:28}}>
+          <p className="caps" style={{color:"var(--gold)",margin:"0 0 4px"}}>Growth</p>
+          <h2 className="serif-bold" style={{fontSize:20,color:"var(--ink)",margin:"0 0 20px"}}>Monthly Mux</h2>
+          <ResponsiveContainer width="100%" height={220}>
+            <BarChart data={COST_DATA}>
+              <defs>
+                <linearGradient id="barBlue" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stopColor="#3b82f6"/>
+                  <stop offset="100%" stopColor="#1e3a8a"/>
+                </linearGradient>
+              </defs>
+              <CartesianGrid strokeDasharray="3 3" stroke="rgba(15,23,42,0.06)"/>
+              <XAxis dataKey="month" tick={{fontSize:11,fill:"#475569"}} axisLine={false} tickLine={false}/>
+              <YAxis tick={{fontSize:11,fill:"#475569"}} axisLine={false} tickLine={false}/>
+              <Tooltip contentStyle={tooltipStyle} cursor={{fill:"rgba(30,58,138,0.05)"}}/>
+              <Bar dataKey="mux" fill="url(#barBlue)" radius={[8,8,0,0]} name="Cost ($)"/>
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
+      </div>
+      
+      <div className="card fade-in-up" style={{padding:28,animationDelay:"0.25s"}}>
+        <p className="caps" style={{color:"var(--gold)",margin:"0 0 4px"}}>April 2026</p>
+        <h3 className="serif-bold" style={{fontSize:20,color:"var(--ink)",margin:"0 0 20px"}}>Cost Breakdown</h3>
+        {[["Mux storage","$28.40","Per GB stored"],["Mux delivery","$89.60","Per GB delivered"],["Mux live streaming","$24.50","Per active hour"],["Stripe fees","$3.90","2.9% + 30¢ per transaction"],["Total","$146.40",""]].map(([l,v,d],i)=>(
+          <div key={l} style={{display:"flex",justifyContent:"space-between",alignItems:"center",padding:"14px 0",borderTop:i>0?"1px solid var(--border)":"none"}}>
+            <div>
+              <p className="serif" style={{fontWeight:i===4?700:500,fontSize:i===4?16:14,color:i===4?"var(--blue)":"var(--ink)",margin:0}}>{l}</p>
+              {d && <p style={{fontSize:11,color:"var(--muted)",margin:"3px 0 0"}}>{d}</p>}
+            </div>
+            <span className="serif-bold" style={{fontSize:i===4?18:15,color:i===4?"var(--gold)":"var(--ink)"}}>{v}</span>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+};
+
+const LearningCircles = () => {
+  const [view,setView] = useState("overview");
+  if (view==="circle") return (
+    <div style={{padding:32,maxWidth:760,margin:"0 auto"}} className="fade-in">
+      <button onClick={()=>setView("overview")} style={{display:"flex",alignItems:"center",gap:8,background:"none",border:"none",color:"var(--muted)",fontWeight:600,fontSize:13,cursor:"pointer",marginBottom:22,padding:0,fontFamily:"inherit"}} onMouseOver={e=>e.currentTarget.style.color="var(--blue)"} onMouseOut={e=>e.currentTarget.style.color="var(--muted)"}>
+        <ArrowLeft size={15}/>Back
+      </button>
+      <div style={{display:"flex",alignItems:"center",gap:14,marginBottom:6,flexWrap:"wrap"}}>
+        <div>
+          <p className="caps" style={{color:"var(--gold)",margin:"0 0 6px"}}>Week of 14–18 April</p>
+          <h1 className="serif-bold" style={{fontSize:32,color:"var(--ink)",margin:0}}>Circle Alpha</h1>
+        </div>
+        <Badge label="7 Members" variant="default"/>
+      </div>
+      
+      <div className="card fade-in-up" style={{overflow:"hidden",marginTop:24,borderRadius:20}}>
+        <div style={{padding:"14px 24px",display:"grid",gridTemplateColumns:"1.2fr 1fr 1fr 1fr",gap:12,borderBottom:"1px solid var(--border)",background:"var(--bg-soft)"}}>
+          {["Member","Action 1 (5 days)","Action 2 (5 days)","Status"].map(h=><p key={h} className="caps" style={{color:"var(--gold)",margin:0}}>{h}</p>)}
+        </div>
+        {CIRCLE_MEMBERS.map((m,i)=>(
+          <div key={m.name} style={{display:"grid",gridTemplateColumns:"1.2fr 1fr 1fr 1fr",gap:12,padding:"16px 24px",alignItems:"center",borderTop:i>0?"1px solid var(--border)":"none"}}>
+            <div>
+              <p className="serif" style={{fontWeight:600,color:"var(--ink)",fontSize:14,margin:0}}>{m.name}</p>
+              <p style={{fontSize:11,color:"var(--muted)",margin:"3px 0 0"}}>{m.role}</p>
+            </div>
+            <div style={{display:"flex",gap:3}}>{[...Array(5)].map((_,j)=><div key={j} style={{width:14,height:14,borderRadius:4,background:j<m.a1?"linear-gradient(135deg,#d4af6a,#b8924a)":"var(--border-strong)",transition:"all .3s"}}/>)}</div>
+            <div style={{display:"flex",gap:3}}>{[...Array(5)].map((_,j)=><div key={j} style={{width:14,height:14,borderRadius:4,background:j<m.a2?"linear-gradient(135deg,#3b82f6,#1e3a8a)":"var(--border-strong)",transition:"all .3s"}}/>)}</div>
+            <Badge label={m.status} variant={m.status}/>
+          </div>
+        ))}
+      </div>
+      
+      <div className="card fade-in-up stagger-2" style={{padding:20,marginTop:18,border:"1px solid rgba(220,38,38,0.25)",background:"rgba(220,38,38,0.03)"}}>
+        <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:6}}><AlertCircle size={16} color="var(--danger)"/><p className="serif" style={{fontWeight:600,color:"var(--danger)",fontSize:15,margin:0}}>2 Members Need Support</p></div>
+        <p style={{color:"#991b1b",fontSize:13,margin:0}}>Ruth P. and Grace O. have very low engagement this week. Consider a pastoral check-in.</p>
+      </div>
+    </div>
+  );
+  
+  return (
+    <div style={{padding:32}} className="fade-in">
+      <SectionHeader eyebrow="Kingdom Growth Systems" title="Learning Circles" subtitle="Groups of seven engaging in daily micro-learning. Visibility replaces enforcement. Grace is a feature, not a gap."
+        action={<Badge label="UI Prototype" variant="default"/>}/>
+      
+      <div style={{display:"grid",gridTemplateColumns:"repeat(4,1fr)",gap:18,marginBottom:24}}>
+        <StatCard label="Active Circles" value="12" sub="84 total members" icon={Users} delay={0}/>
+        <StatCard label="Avg Completion" value="76%" sub="+3% this week" icon={TrendingUp} trend="up" delay={0.05}/>
+        <StatCard label="People Growing" value="71" sub="84% of members" icon={TrendingUp} trend="up" delay={0.1}/>
+        <StatCard label="Need Support" value="3" sub="Flagged this week" icon={AlertCircle} delay={0.15}/>
+      </div>
+      
+      <div className="card fade-in-up stagger-3" style={{overflow:"hidden",marginBottom:20,borderRadius:20}}>
+        <div style={{padding:"20px 24px",borderBottom:"1px solid var(--border)"}}>
+          <p className="caps" style={{color:"var(--gold)",margin:"0 0 4px"}}>Week 12</p>
+          <h2 className="serif-bold" style={{fontSize:20,color:"var(--ink)",margin:0}}>Active Circles</h2>
+        </div>
+        {["Alpha","Beta","Gamma","Delta"].map((name,i)=>(
+          <div key={name} onClick={()=>setView("circle")} style={{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"18px 24px",cursor:"pointer",borderTop:i>0?"1px solid var(--border)":"none",transition:"background .2s"}} onMouseOver={e=>e.currentTarget.style.background="var(--bg-soft)"} onMouseOut={e=>e.currentTarget.style.background="transparent"}>
+            <div style={{display:"flex",alignItems:"center",gap:14}}>
+              <div style={{width:42,height:42,background:"linear-gradient(135deg,#1e3a8a,#0f1e4a)",borderRadius:12,display:"flex",alignItems:"center",justifyContent:"center",fontWeight:800,fontSize:12,color:"#d4af6a",fontFamily:"'Playfair Display',serif",boxShadow:"0 4px 20px var(--blue-glow), 0 0 0 1px var(--gold)"}}>{name.slice(0,2).toUpperCase()}</div>
+              <div>
+                <p className="serif" style={{fontWeight:600,color:"var(--ink)",fontSize:16,margin:0}}>Circle {name}</p>
+                <p style={{fontSize:12,color:"var(--muted)",margin:"3px 0 0"}}>7 members · Active</p>
+              </div>
+            </div>
+            <div style={{display:"flex",alignItems:"center",gap:14}}>
+              <div style={{textAlign:"right"}}>
+                <p className="serif-bold" style={{fontSize:18,color:"var(--blue)",margin:0}}>{[78,91,65,84][i]}%</p>
+                <p className="caps" style={{color:"var(--muted)",margin:"3px 0 0"}}>completion</p>
+              </div>
+              {i===2 && <Badge label="1 Flagged" variant="needs-support"/>}
+              <ChevronRight size={14} color="var(--faint)"/>
+            </div>
+          </div>
+        ))}
+      </div>
+      
+      <div className="card fade-in-up" style={{padding:28,animationDelay:"0.3s",border:"1px solid var(--gold)",background:"linear-gradient(135deg, rgba(184,146,74,0.04), rgba(30,58,138,0.02))"}}>
+        <div style={{display:"flex",alignItems:"flex-start",gap:16,marginBottom:12}}>
+          <div style={{width:44,height:44,background:"linear-gradient(135deg,#1e3a8a,#0f1e4a)",borderRadius:12,display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0,boxShadow:"0 8px 30px var(--blue-glow), 0 0 0 1px var(--gold)"}}><Sparkles size={20} color="#d4af6a"/></div>
+          <div style={{flex:1}}>
+            <p className="caps" style={{color:"var(--gold)",margin:"0 0 4px"}}>Coming in Phase 2</p>
+            <h3 className="serif-bold" style={{fontSize:20,color:"var(--ink)",margin:0}}>Full Learning Circles Platform</h3>
+          </div>
+        </div>
+        <p style={{color:"var(--muted)",fontSize:14,lineHeight:1.7,margin:"0 0 18px"}}>Complete automation layer — AI-generated weekly summaries, My Week in Review, pastor dashboards, and engagement tracking. Built on the Kingdom DNA framework and the 33 Kingdom Standards.</p>
+        <button className="btn-gold"><Bell size={14}/>Notify Me When Available</button>
+      </div>
+    </div>
+  );
+};
+
+export default function App() {
+  const [screen,setScreen] = useState("login");
+  const [loggedIn,setLoggedIn] = useState(false);
+  const [nav,setNav] = useState("dashboard");
+  const [open,setOpen] = useState(true);
+  const [sermon,setSermon] = useState(null);
+  const go = s => { setNav(s); setScreen(s); setSermon(null); };
+  
+  useEffect(() => { document.body.style.background = "#fafbff"; document.body.style.margin = "0"; }, []);
+  
+  if (!loggedIn) return <><Styles/><LoginScreen onLogin={()=>{setLoggedIn(true);setScreen("dashboard");}}/></>;
+  
+  return (
+    <>
+      <Styles/>
+      <div className="mtg-root">
+        <Aurora/>
+        <div style={{display:"flex",minHeight:"100vh",position:"relative",zIndex:1}}>
+          <Sidebar active={nav} onNav={go} open={open} onToggle={()=>setOpen(o=>!o)} onLogout={()=>{setLoggedIn(false);setScreen("login");}}/>
+          <main style={{flex:1,minWidth:0,display:"flex",flexDirection:"column"}}>
+            <TopBar/>
+            <div key={screen+(sermon?.id||"")} style={{flex:1}}>
+              {screen==="dashboard" && <Dashboard onNav={go}/>}
+              {screen==="stream" && <StreamSetup/>}
+              {screen==="upload" && <UploadSermon/>}
+              {screen==="library" && <SermonLibrary onDetail={s=>{setSermon(s);setScreen("detail");}}/>}
+              {screen==="detail" && sermon && <SermonDetail sermon={sermon} onBack={()=>setScreen("library")}/>}
+              {screen==="subscriptions" && <Subscriptions/>}
+              {screen==="costs" && <CostDashboard/>}
+              {screen==="circles" && <LearningCircles/>}
+            </div>
+          </main>
+        </div>
+      </div>
+    </>
+  );
+}
